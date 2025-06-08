@@ -1,0 +1,49 @@
+# Azure DevOps Pipeline for MAUI Android
+trigger:
+- main
+- develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '9.0.x'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Install .NET SDK'
+  inputs:
+    packageType: 'sdk'
+    version: $(dotnetVersion)
+    
+- script: dotnet workload install maui
+  displayName: 'Install MAUI Workload'
+  
+- task: DotNetCoreCLI@2
+  displayName: 'Restore NuGet Packages'
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+    
+- task: DotNetCoreCLI@2
+  displayName: 'Build Android App'
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '-f net9.0-android -c $(buildConfiguration)'
+    
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Android APK'
+  inputs:
+    command: 'publish'
+    projects: '**/*.csproj'
+    arguments: '-f net9.0-android -c $(buildConfiguration) -p:AndroidPackageFormat=apk'
+    publishWebProjects: false
+    zipAfterPublish: false
+    
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish APK Artifacts'
+  inputs:
+    pathToPublish: 'bin/$(buildConfiguration)/net9.0-android/publish'
+    artifactName: 'maui-efcore-pipeline-build'
