@@ -98,33 +98,6 @@ steps:
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
     flattenFolders: true
 
-- task: PowerShell@2
-  displayName: 'Rename APK with Version'
-  inputs:
-    targetType: 'inline'
-    script: |
-      $apkDirectory = "$(Build.ArtifactStagingDirectory)"
-      $appVersion = $env:AppVersion
-      
-      if (-not $appVersion) {
-          Write-Host "Error: AppVersion is not set in the pipeline."
-          exit 1
-      }
-      
-      $apkFiles = Get-ChildItem -Path $apkDirectory -Filter *.apk
-      
-      if ($apkFiles.Count -eq 0) {
-          Write-Host "No APK files found."
-      } else {
-          foreach ($apkFile in $apkFiles) {
-              $newFileName = "YourAppName-v{0}-{1}{2}" -f $appVersion, $env:BUILD_BUILDID, $apkFile.Extension
-              $newFilePath = Join-Path $apkDirectory $newFileName
-              
-              Rename-Item -Path $apkFile.FullName -NewName $newFileName
-              Write-Host "Renamed '$($apkFile.Name)' to '$newFileName'"
-          }
-      }
-
 - task: PublishBuildArtifacts@1
   displayName: 'Publish APK Artifact'
   inputs:
