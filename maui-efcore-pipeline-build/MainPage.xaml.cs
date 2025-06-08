@@ -1,25 +1,79 @@
-﻿namespace maui_efcore_pipeline_build
+﻿using maui_efcore_pipeline_build.EFCore.Contexts;
+using maui_efcore_pipeline_build.EFCore.Models.Audit;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+
+namespace maui_efcore_pipeline_build
 {
-    public partial class MainPage : ContentPage
+    public partial class MainPage : ContentPage, INotifyPropertyChanged
     {
-        int count = 0;
+        private readonly IMauiDbContext _mauiDbContext;
 
-        public MainPage()
+        public ICommand AddErrorLogCommand { get; }
+
+        public MainPage(IMauiDbContext mauiDbContext)
         {
+            _mauiDbContext = mauiDbContext;
+
+            AddErrorLogCommand = new Command(() => AddErrorLog());
+
             InitializeComponent();
+            BindingContext = this;
         }
 
-        private void OnCounterClicked(object sender, EventArgs e)
+        override protected void OnAppearing()
         {
-            count++;
-
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            base.OnAppearing();
+            LoadErrorLogs();
         }
+
+        private void AddErrorLog()
+        {
+            var errorLog = new ErrorLog
+            {
+                Message = $"Error log at {DateTime.Now}"
+            };
+
+            _mauiDbContext.ErrorLogs.Add(errorLog);
+            _mauiDbContext.SaveChanges();
+
+            ErrorLogs.Add(errorLog);
+
+            LoadErrorLogs();
+        }
+
+        private void LoadErrorLogs()
+        {
+            var logs = _mauiDbContext.ErrorLogs.ToList();
+
+            ErrorLogs.Clear();
+            foreach (var log in logs)
+            {
+                ErrorLogs.Add(log);
+            }
+        }
+
+        private ObservableCollection<ErrorLog> _errorLogs = new ObservableCollection<ErrorLog>();
+        public ObservableCollection<ErrorLog> ErrorLogs
+        {
+            get => _errorLogs;
+            set
+            {
+                _errorLogs = value;
+                OnPropertyChanged(nameof(ErrorLogs));
+            }
+        }
+
+        #region PropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
     }
 
 }

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "maui-efcore-pipeline-build", "maui-efcore-pipeline-build\maui-efcore-pipeline-build.csproj", "{ED6C8B97-1DBC-4E2E-B730-AC30E8C78D49}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore", "EFCore\EFCore.csproj", "{5F501EC4-246E-4045-907D-ADF62BB222FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,8 +15,13 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{ED6C8B97-1DBC-4E2E-B730-AC30E8C78D49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ED6C8B97-1DBC-4E2E-B730-AC30E8C78D49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED6C8B97-1DBC-4E2E-B730-AC30E8C78D49}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{ED6C8B97-1DBC-4E2E-B730-AC30E8C78D49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED6C8B97-1DBC-4E2E-B730-AC30E8C78D49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F501EC4-246E-4045-907D-ADF62BB222FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F501EC4-246E-4045-907D-ADF62BB222FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F501EC4-246E-4045-907D-ADF62BB222FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F501EC4-246E-4045-907D-ADF62BB222FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
