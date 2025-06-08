@@ -17,8 +17,8 @@ steps:
     packageType: 'sdk'
     version: $(dotnetVersion)
     
-- script: dotnet workload install maui
-  displayName: 'Install MAUI Workload'
+- script: dotnet workload install maui-android
+  displayName: 'Install MAUI Android Workload'
   
 - task: DotNetCoreCLI@2
   displayName: 'Restore NuGet Packages'
