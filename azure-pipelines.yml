@@ -55,11 +55,25 @@ steps:
       }
       
       Write-Host "========================================"
+      Write-Host "Locating the .csproj file..."
+      Write-Host "========================================"
+      
+      $csprojPath = Get-ChildItem -Path "$(Build.SourcesDirectory)" -Recurse -Filter *.csproj | Select-Object -First 1
+      
+      if (-not $csprojPath) {
+          Write-Host "❌ Error: No .csproj file found." -ForegroundColor Red
+          exit 1
+      }
+      
+      Write-Host "Found project file: $($csprojPath.FullName)"
+      Write-Host ""
+      
+      Write-Host "========================================"
       Write-Host "Building the Project..."
       Write-Host "========================================"
       
       # Build command for your project
-      $buildCommand = "dotnet build **/*.csproj -c Release -f net9.0-android -v minimal -nologo -p:ApplicationVersion=$versionCode -p:ApplicationDisplayVersion=$appVersion -p:AndroidUseManagedDesignTimeResourceGenerator=false -p:AndroidEnableMultiDex=true -p:AndroidPackageFormat=apk"
+      $buildCommand = "dotnet build `"$($csprojPath.FullName)`" -c Release -f net9.0-android -v minimal -nologo -p:ApplicationVersion=$versionCode -p:ApplicationDisplayVersion=$appVersion -p:AndroidUseManagedDesignTimeResourceGenerator=false -p:AndroidEnableMultiDex=true -p:AndroidPackageFormat=apk"
       
       Write-Host "Executing: $buildCommand"
       Invoke-Expression $buildCommand
@@ -103,7 +117,7 @@ steps:
           Write-Host "No APK files found."
       } else {
           foreach ($apkFile in $apkFiles) {
-              $newFileName = "maui-efcore-pipeline-build-v{0}-{1}{2}" -f $appVersion, $env:BUILD_BUILDID, $apkFile.Extension
+              $newFileName = "YourAppName-v{0}-{1}{2}" -f $appVersion, $env:BUILD_BUILDID, $apkFile.Extension
               $newFilePath = Join-Path $apkDirectory $newFileName
               
               Rename-Item -Path $apkFile.FullName -NewName $newFileName
