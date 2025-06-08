@@ -1,52 +1,118 @@
-# Azure DevOps Pipeline for MAUI Android Only (.NET 9)
+# Simplified Azure DevOps Pipeline for MAUI Android (.NET 9)
 trigger:
 - main
 - develop
 
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
-  buildConfiguration: 'Release'
-  dotnetVersion: '9.0.x'
-  targetFramework: 'net9.0-android'
-  androidRuntime: 'android-arm64'
+  AppVersion: '1.0.0'  # Set your app version here or define in Variables tab
+
+pool:
+  vmImage: 'windows-latest'
 
 steps:
+- checkout: self
+  fetchDepth: 1
+
 - task: UseDotNet@2
   displayName: 'Install .NET 9 SDK'
   inputs:
-    packageType: 'sdk'
-    version: $(dotnetVersion)
-    
-- script: dotnet workload install android maui-android
-  displayName: 'Install Android and MAUI Android Workloads'
-  
-- task: DotNetCoreCLI@2
-  displayName: 'Restore Android Packages Only'
+    version: '9.x'
+
+- task: CmdLine@2
+  displayName: 'Install MAUI Workload'
   inputs:
-    command: 'restore'
-    projects: '**/*.csproj'
-    arguments: '-f $(targetFramework) --runtime $(androidRuntime)'
-    
-- task: DotNetCoreCLI@2
-  displayName: 'Build Android App'
+    script: 'dotnet workload install maui'
+
+- task: NuGetCommand@2
+  displayName: 'NuGet Restore'
   inputs:
-    command: 'build'
-    projects: '**/*.csproj'
-    arguments: '-f $(targetFramework) -c $(buildConfiguration) --runtime $(androidRuntime) --no-restore'
+    solution: '**/*.sln'
     
-- task: DotNetCoreCLI@2
-  displayName: 'Publish Android APK'
+- task: PowerShell@2
+  displayName: 'Build MAUI Android App'
   inputs:
-    command: 'publish'
-    projects: '**/*.csproj'
-    arguments: '-f $(targetFramework) -c $(buildConfiguration) --runtime $(androidRuntime) --no-restore --no-build -p:AndroidPackageFormat=apk'
-    publishWebProjects: false
-    zipAfterPublish: false
-    
+    targetType: 'inline'
+    script: |
+      Write-Host "========================================"
+      Write-Host "Setting Versions..."
+      Write-Host "========================================"
+      
+      $appVersion = $env:AppVersion
+      $versionCode = $env:BUILD_BUILDID
+      
+      Write-Host "AppVersion: $appVersion"
+      Write-Host "VersionCode: $versionCode"
+      Write-Host ""
+      
+      if (-not $appVersion) {
+          Write-Host "❌ Error: AppVersion is not set." -ForegroundColor Red
+          exit 1
+      }
+      
+      if (-not $versionCode -or $versionCode -notmatch '^\d+$') {
+          Write-Host "❌ Error: VersionCode is invalid or not set." -ForegroundColor Red
+          exit 1
+      }
+      
+      Write-Host "========================================"
+      Write-Host "Building the Project..."
+      Write-Host "========================================"
+      
+      # Build command for your project
+      $buildCommand = "dotnet build **/*.csproj -c Release -f net9.0-android -v minimal -nologo -p:ApplicationVersion=$versionCode -p:ApplicationDisplayVersion=$appVersion -p:AndroidUseManagedDesignTimeResourceGenerator=false -p:AndroidEnableMultiDex=true -p:AndroidPackageFormat=apk"
+      
+      Write-Host "Executing: $buildCommand"
+      Invoke-Expression $buildCommand
+      
+      if ($LASTEXITCODE -eq 0) {
+          Write-Host "✔ Project built successfully." -ForegroundColor Green
+      } else {
+          Write-Host "❌ Error: Build failed." -ForegroundColor Red
+          exit 1
+      }
+      
+      Write-Host ""
+      Write-Host "========================================"
+      Write-Host "Build Process Completed."
+      Write-Host "========================================"
+
+- task: CopyFiles@2
+  displayName: 'Copy APK to Artifacts'
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '**/bin/Release/net9.0-android/**/*.apk'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    flattenFolders: true
+
+- task: PowerShell@2
+  displayName: 'Rename APK with Version'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $apkDirectory = "$(Build.ArtifactStagingDirectory)"
+      $appVersion = $env:AppVersion
+      
+      if (-not $appVersion) {
+          Write-Host "Error: AppVersion is not set in the pipeline."
+          exit 1
+      }
+      
+      $apkFiles = Get-ChildItem -Path $apkDirectory -Filter *.apk
+      
+      if ($apkFiles.Count -eq 0) {
+          Write-Host "No APK files found."
+      } else {
+          foreach ($apkFile in $apkFiles) {
+              $newFileName = "maui-efcore-pipeline-build-v{0}-{1}{2}" -f $appVersion, $env:BUILD_BUILDID, $apkFile.Extension
+              $newFilePath = Join-Path $apkDirectory $newFileName
+              
+              Rename-Item -Path $apkFile.FullName -NewName $newFileName
+              Write-Host "Renamed '$($apkFile.Name)' to '$newFileName'"
+          }
+      }
+
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Android APK Artifact'
+  displayName: 'Publish APK Artifact'
   inputs:
-    pathToPublish: 'bin/$(buildConfiguration)/$(targetFramework)/$(androidRuntime)/publish'
-    artifactName: 'maui-efcore-pipeline-build'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'android-apk'
