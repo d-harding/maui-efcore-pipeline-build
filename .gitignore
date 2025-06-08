@@ -1,0 +1,13 @@
+# Ignore user-specific files
+*.user
+
+# Ignore build and output directories
+bin/
+obj/
+
+# Visual Studio
+.vscode/
+.vs/
+.vscode/*
+.vsconfig
+.vscode/*
