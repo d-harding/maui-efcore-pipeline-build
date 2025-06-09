@@ -33,7 +33,8 @@ namespace maui_efcore_pipeline_build
         {
             var errorLog = new ErrorLog
             {
-                Message = $"Error log at {DateTime.Now}"
+                Message = $"Error log at {DateTime.Now}",
+                StackTrace = $"{DateTime.Now} - Stack Trace details..."
             };
 
             _mauiDbContext.ErrorLogs.Add(errorLog);

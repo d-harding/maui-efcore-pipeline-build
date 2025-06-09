@@ -5,15 +5,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Add Error Log" Command="{Binding AddErrorLogCommand}" />
+        <ToolbarItem Command="{Binding AddErrorLogCommand}" Text="Add Error Log" />
     </ContentPage.ToolbarItems>
-    
+
     <Grid>
         <CollectionView ItemsSource="{Binding ErrorLogs}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <Label Text="{Binding Message}" />
+                    <Grid RowDefinitions="*,1">
+                        <StackLayout Margin="5">
+                            <Label Text="{Binding Message}" />
+                            <Label Text="{Binding StackTrace, TargetNullValue='No Stack Trace'}" />
+                        </StackLayout>
+                        <BoxView Grid.Row="1" BackgroundColor="Black" />
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

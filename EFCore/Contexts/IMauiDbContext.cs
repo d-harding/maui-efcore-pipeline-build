@@ -7,7 +7,7 @@ namespace maui_efcore_pipeline_build.EFCore.Contexts
     public interface IMauiDbContext
     {
         public DatabaseFacade Database { get; }
-
+        bool Migrate();
         int SaveChanges();
 
         #region Entities

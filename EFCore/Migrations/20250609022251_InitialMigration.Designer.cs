@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using maui_efcore_pipeline_build.EFCore.Contexts;
 
@@ -10,9 +11,11 @@ using maui_efcore_pipeline_build.EFCore.Contexts;
 namespace EFCore.Migrations
 {
     [DbContext(typeof(MauiDbContext))]
-    partial class MauiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250609022251_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.5");
@@ -28,9 +31,6 @@ namespace EFCore.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("StackTrace")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

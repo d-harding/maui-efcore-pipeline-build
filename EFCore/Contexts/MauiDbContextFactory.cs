@@ -9,7 +9,8 @@ namespace maui_efcore_pipeline_build.EFCore.Contexts
     /// cd .\EntityFramework
     /// dotnet ef migrations add InitialMigration
     /// dotnet ef database update
-    /// dotnet ef migrations remove
+    /// dotnet ef migrations add ErrorLog_add_StackTrace
+    /// dotnet ef database update
     /// </summary>
     public class MauiDbContextFactory : IDesignTimeDbContextFactory<MauiDbContext>
     {

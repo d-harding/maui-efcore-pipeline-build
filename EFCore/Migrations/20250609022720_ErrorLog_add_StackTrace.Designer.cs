@@ -11,8 +11,8 @@ using maui_efcore_pipeline_build.EFCore.Contexts;
 namespace EFCore.Migrations
 {
     [DbContext(typeof(MauiDbContext))]
-    [Migration("20250608050958_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250609022720_ErrorLog_add_StackTrace")]
+    partial class ErrorLog_add_StackTrace
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,9 @@ namespace EFCore.Migrations
 
                     b.Property<string>("Message")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StackTrace")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

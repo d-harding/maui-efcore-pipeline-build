@@ -9,14 +9,33 @@ namespace maui_efcore_pipeline_build.EFCore.Contexts
         public MauiDbContext(DbContextOptions<MauiDbContext> options) : base(options)
         {
             SQLitePCL.Batteries_V2.Init();
-            this.Database.Migrate();
+        }
+
+        public bool Migrate()
+        {
+            try
+            {
+                this.Database.Migrate();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public DatabaseFacade Database => new DatabaseFacade(this);
 
         public int SaveChanges()
         {
-            return base.SaveChanges();
+            try
+            {
+                return base.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public DbSet<ErrorLog> ErrorLogs { get; set; }

@@ -1,9 +1,16 @@
-﻿namespace maui_efcore_pipeline_build
+﻿using maui_efcore_pipeline_build.EFCore.Contexts;
+
+namespace maui_efcore_pipeline_build
 {
     public partial class App : Application
     {
-        public App()
+        public App(IMauiDbContext mauiDbContext)
         {
+            if (!mauiDbContext.Migrate())
+            {
+                //TODO: Error
+            }
+
             InitializeComponent();
         }
 
