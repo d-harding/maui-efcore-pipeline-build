@@ -29,6 +29,14 @@ steps:
     solution: '**/*.sln'
     
 - task: PowerShell@2
+  displayName: 'Build EF Core library'
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "Building EF Core project..."
+      dotnet build "$(Build.SourcesDirectory)/EFCore/EFCore.csproj" -c Release
+
+- task: PowerShell@2
   displayName: 'Build MAUI Android App'
   inputs:
     targetType: 'inline'
@@ -58,7 +66,7 @@ steps:
       Write-Host "Locating the .csproj file..."
       Write-Host "========================================"
       
-      $csprojPath = Get-ChildItem -Path "$(Build.SourcesDirectory)" -Recurse -Filter *.csproj | Select-Object -First 1
+      $csprojPath = $(Build.SourcesDirectory)/maui-efcore-pipeline-build/maui-efcore-pipeline-build.csproj
       
       if (-not $csprojPath) {
           Write-Host "❌ Error: No .csproj file found." -ForegroundColor Red
