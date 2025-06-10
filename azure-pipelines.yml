@@ -52,16 +52,17 @@ steps:
       Write-Host "VersionCode: $versionCode"
       Write-Host ""
       
-      dotnet build "$(Build.SourcesDirectory)/maui-efcore-pipeline-build/maui-efcore-pipeline-build.csproj"
-        -c Release 
-        -f net9.0-android 
-        -v minimal 
-        -nologo 
-        -p:ApplicationVersion=$versionCode 
-        -p:ApplicationDisplayVersion=$appVersion 
-        -p:AndroidUseManagedDesignTimeResourceGenerator=false 
-        -p:AndroidEnableMultiDex=true 
+      dotnet build "$(Build.SourcesDirectory)/maui-efcore-pipeline-build/maui-efcore-pipeline-build.csproj" `
+        -c Release `
+        -f net9.0-android `
+        -v minimal `
+        -nologo `
+        -p:ApplicationVersion=$versionCode `
+        -p:ApplicationDisplayVersion=$appVersion `
+        -p:AndroidUseManagedDesignTimeResourceGenerator=false `
+        -p:AndroidEnableMultiDex=true `
         -p:AndroidPackageFormat=apk
+
 
       Write-Host ""
       Write-Host "========================================"
