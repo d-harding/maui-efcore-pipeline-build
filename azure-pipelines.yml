@@ -52,47 +52,17 @@ steps:
       Write-Host "VersionCode: $versionCode"
       Write-Host ""
       
-      if (-not $appVersion) {
-          Write-Host "❌ Error: AppVersion is not set." -ForegroundColor Red
-          exit 1
-      }
-      
-      if (-not $versionCode -or $versionCode -notmatch '^\d+$') {
-          Write-Host "❌ Error: VersionCode is invalid or not set." -ForegroundColor Red
-          exit 1
-      }
-      
-      Write-Host "========================================"
-      Write-Host "Locating the .csproj file..."
-      Write-Host "========================================"
-      
-      $csprojPath = $(Build.SourcesDirectory)/maui-efcore-pipeline-build/maui-efcore-pipeline-build.csproj
-      
-      if (-not $csprojPath) {
-          Write-Host "❌ Error: No .csproj file found." -ForegroundColor Red
-          exit 1
-      }
-      
-      Write-Host "Found project file: $($csprojPath.FullName)"
-      Write-Host ""
-      
-      Write-Host "========================================"
-      Write-Host "Building the Project..."
-      Write-Host "========================================"
-      
-      # Build command for your project
-      $buildCommand = "dotnet build `"$($csprojPath.FullName)`" -c Release -f net9.0-android -v minimal -nologo -p:ApplicationVersion=$versionCode -p:ApplicationDisplayVersion=$appVersion -p:AndroidUseManagedDesignTimeResourceGenerator=false -p:AndroidEnableMultiDex=true -p:AndroidPackageFormat=apk"
-      
-      Write-Host "Executing: $buildCommand"
-      Invoke-Expression $buildCommand
-      
-      if ($LASTEXITCODE -eq 0) {
-          Write-Host "✔ Project built successfully." -ForegroundColor Green
-      } else {
-          Write-Host "❌ Error: Build failed." -ForegroundColor Red
-          exit 1
-      }
-      
+      dotnet build "$(Build.SourcesDirectory)/maui-efcore-pipeline-build/maui-efcore-pipeline-build.csproj"
+        -c Release 
+        -f net9.0-android 
+        -v minimal 
+        -nologo 
+        -p:ApplicationVersion=$versionCode 
+        -p:ApplicationDisplayVersion=$appVersion 
+        -p:AndroidUseManagedDesignTimeResourceGenerator=false 
+        -p:AndroidEnableMultiDex=true 
+        -p:AndroidPackageFormat=apk
+
       Write-Host ""
       Write-Host "========================================"
       Write-Host "Build Process Completed."
